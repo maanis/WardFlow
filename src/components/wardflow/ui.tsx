@@ -88,7 +88,7 @@ export function Table({ head, children, empty }: { head: string[]; children: Rea
 
   return (
     <div>
-      <div className="overflow-x-hidden">
+      <div className="overflow-x-auto">
         <table className="w-full text-xs sm:text-sm">
           <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>{head.map((h) => <th key={h} className="whitespace-nowrap px-2 py-2 font-medium sm:px-3">{h}</th>)}</tr>
