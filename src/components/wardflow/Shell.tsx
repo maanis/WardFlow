@@ -85,10 +85,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <SelectContent align="end">
               <SelectGroup>
                 <SelectLabel>Demo role</SelectLabel>
-                {(Object.keys(ROLE_LABEL) as Role[]).map((itemRole) => {
-                  const Icon = ROLE_ICONS[itemRole];
-                  return <SelectItem key={itemRole} value={itemRole}><span className="flex items-center gap-2"><Icon className="h-4 w-4 text-muted-foreground" />{ROLE_LABEL[itemRole]}</span></SelectItem>;
-                })}
+                {(Object.keys(ROLE_LABEL) as Role[]).map((itemRole) => <SelectItem key={itemRole} value={itemRole}>{ROLE_LABEL[itemRole]}</SelectItem>)}
               </SelectGroup>
             </SelectContent>
           </Select>
