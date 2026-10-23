@@ -1,7 +1,7 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, type ReactNode } from "react";
 import { Activity, BedDouble, ClipboardList, LayoutDashboard, RotateCcw, Stethoscope, Thermometer, UserRoundCog, Users } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useWard } from "@/lib/wardflow/store";
 import { CAPACITY, ROLE_LABEL, occupiesBed, type Role } from "@/lib/wardflow/logic";
 import { WorkflowGuideDialog } from "./WorkflowGuideDialog";
@@ -83,11 +83,13 @@ export function Shell({ children }: { children: ReactNode }) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent align="end">
-              <SelectLabel>Demo role</SelectLabel>
-              {(Object.keys(ROLE_LABEL) as Role[]).map((itemRole) => {
-                const Icon = ROLE_ICONS[itemRole];
-                return <SelectItem key={itemRole} value={itemRole}><span className="flex items-center gap-2"><Icon className="h-4 w-4 text-muted-foreground" />{ROLE_LABEL[itemRole]}</span></SelectItem>;
-              })}
+              <SelectGroup>
+                <SelectLabel>Demo role</SelectLabel>
+                {(Object.keys(ROLE_LABEL) as Role[]).map((itemRole) => {
+                  const Icon = ROLE_ICONS[itemRole];
+                  return <SelectItem key={itemRole} value={itemRole}><span className="flex items-center gap-2"><Icon className="h-4 w-4 text-muted-foreground" />{ROLE_LABEL[itemRole]}</span></SelectItem>;
+                })}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </header>
