@@ -8,7 +8,7 @@ import {
 } from "@/lib/wardflow/logic";
 import { PageHeader, Panel, Pill, Stat, StatusPill, Table, Td, TempPill, fmtDate } from "@/components/wardflow/ui";
 import { PatientDialog, RegisterDialog, TempDialog } from "@/components/wardflow/dialogs";
-import { MortalitySummary, ClosedCasesTable } from "./reports";
+import { MortalitySummary, ClosedCasesTable } from "@/components/wardflow/reports";
 
 export const Route = createFileRoute("/")({
   head: () => ({
