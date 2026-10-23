@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+import { Children, useEffect, useState, type ReactNode } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { isFever, todayReading, visitedOn, type Patient, type PatientStatus, type WardData } from "@/lib/wardflow/logic";
 
@@ -63,17 +65,42 @@ export function Panel({ title, action, children, className }: { title: string; a
   );
 }
 
+const ROWS_PER_PAGE = 10;
+
 export function Table({ head, children, empty }: { head: string[]; children: ReactNode; empty?: boolean | undefined }) {
+  const [page, setPage] = useState(0);
+  const rows = Children.toArray(children);
+  const pageCount = Math.max(1, Math.ceil(rows.length / ROWS_PER_PAGE));
+  const currentPage = Math.min(page, pageCount - 1);
+  const start = currentPage * ROWS_PER_PAGE;
+  const visibleRows = rows.slice(start, start + ROWS_PER_PAGE);
+
+  useEffect(() => {
+    setPage((current) => Math.min(current, pageCount - 1));
+  }, [pageCount]);
+
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
-          <tr>{head.map((h) => <th key={h} className="whitespace-nowrap px-3 py-2 font-medium">{h}</th>)}</tr>
-        </thead>
-        <tbody className="divide-y">
-          {empty ? <tr><td colSpan={head.length} className="px-3 py-6 text-center text-muted-foreground">Nothing to show.</td></tr> : children}
-        </tbody>
-      </table>
+    <div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>{head.map((h) => <th key={h} className="whitespace-nowrap px-3 py-2 font-medium">{h}</th>)}</tr>
+          </thead>
+          <tbody className="divide-y">
+            {empty ? <tr><td colSpan={head.length} className="px-3 py-6 text-center text-muted-foreground">Nothing to show.</td></tr> : visibleRows}
+          </tbody>
+        </table>
+      </div>
+      {rows.length > ROWS_PER_PAGE && (
+        <div className="flex items-center justify-between border-t px-3 py-2">
+          <span className="text-xs text-muted-foreground">Showing {start + 1}–{Math.min(start + ROWS_PER_PAGE, rows.length)} of {rows.length}</span>
+          <div className="flex items-center gap-1">
+            <Button size="sm" variant="ghost" aria-label="Previous page" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}><ChevronLeft /></Button>
+            <span className="min-w-16 text-center text-xs text-muted-foreground">Page {currentPage + 1} of {pageCount}</span>
+            <Button size="sm" variant="ghost" aria-label="Next page" disabled={currentPage === pageCount - 1} onClick={() => setPage(currentPage + 1)}><ChevronRight /></Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

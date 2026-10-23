@@ -1,6 +1,7 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, type ReactNode } from "react";
-import { Activity, BedDouble, ClipboardList, LayoutDashboard, RotateCcw, Stethoscope, Thermometer, Users } from "lucide-react";
+import { Activity, BedDouble, ClipboardList, LayoutDashboard, RotateCcw, Stethoscope, Thermometer, UserRoundCog, Users } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useWard } from "@/lib/wardflow/store";
 import { CAPACITY, ROLE_LABEL, occupiesBed, type Role } from "@/lib/wardflow/logic";
 import { WorkflowGuideDialog } from "./WorkflowGuideDialog";
@@ -27,12 +28,20 @@ const NAV = {
   ],
 } as const;
 
+const ROLE_ICONS: Record<Role, typeof UserRoundCog> = {
+  nurse: Thermometer,
+  doctor: Stethoscope,
+  admin: BedDouble,
+  head: ClipboardList,
+};
+
 export function Shell({ children }: { children: ReactNode }) {
   const { role, setRole, data, today, reset } = useWard();
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const nav = useMemo(() => NAV[role], [role]);
   const occupied = useMemo(() => data.patients.filter(occupiesBed).length, [data.patients]);
+  const RoleIcon = ROLE_ICONS[role];
 
   useEffect(() => {
     if (!nav.some((item) => item.to === pathname)) router.navigate({ to: "/", replace: true });
@@ -68,13 +77,19 @@ export function Shell({ children }: { children: ReactNode }) {
             Quarantine Centre · {new Date(today + "T00:00:00").toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
           </span>
           <div className="ml-auto"><WorkflowGuideDialog /></div>
-          <label className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Demo role</span>
-            <select value={role} onChange={(e) => setRole(e.target.value as Role)}
-              className="h-8 rounded-md border border-input bg-card px-2 text-sm font-medium">
-              {(Object.keys(ROLE_LABEL) as Role[]).map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}
-            </select>
-          </label>
+          <Select value={role} onValueChange={(value) => setRole(value as Role)}>
+            <SelectTrigger aria-label="Change demo role" className="h-9 w-40 gap-2 rounded-lg bg-card px-2.5 shadow-sm sm:w-48">
+              <RoleIcon className="h-4 w-4 shrink-0 text-primary" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              <SelectLabel>Demo role</SelectLabel>
+              {(Object.keys(ROLE_LABEL) as Role[]).map((itemRole) => {
+                const Icon = ROLE_ICONS[itemRole];
+                return <SelectItem key={itemRole} value={itemRole}><span className="flex items-center gap-2"><Icon className="h-4 w-4 text-muted-foreground" />{ROLE_LABEL[itemRole]}</span></SelectItem>;
+              })}
+            </SelectContent>
+          </Select>
         </header>
         <nav className="flex gap-1 overflow-x-auto border-b bg-card px-2 py-1.5 md:hidden">
           {nav.map(({ to, label }) => (
