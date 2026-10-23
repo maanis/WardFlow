@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Activity, BedDouble, ClipboardList, LayoutDashboard, RotateCcw, Stethoscope, Thermometer, Users } from "lucide-react";
 import { useWard } from "@/lib/wardflow/store";
 import { CAPACITY, ROLE_LABEL, occupiesBed, type Role } from "@/lib/wardflow/logic";
+import { WorkflowGuideDialog } from "./WorkflowGuideDialog";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -45,7 +46,8 @@ export function Shell({ children }: { children: ReactNode }) {
           <span className="hidden text-sm text-muted-foreground sm:inline">
             Quarantine Centre · {new Date(today + "T00:00:00").toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
           </span>
-          <label className="ml-auto flex items-center gap-2 text-sm">
+          <div className="ml-auto"><WorkflowGuideDialog /></div>
+          <label className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">Demo role</span>
             <select value={role} onChange={(e) => setRole(e.target.value as Role)}
               className="h-8 rounded-md border border-input bg-card px-2 text-sm font-medium">
