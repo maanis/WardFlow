@@ -29,7 +29,7 @@ export function VisitPill({ data, p, today }: { data: WardData; p: Patient; toda
   return visitedOn(data, p.id, today) ? <Pill tone="success">Visited</Pill> : <Pill tone="neutral">Not visited</Pill>;
 }
 
-export function PageHeader({ title, sub, children }: { title: string; sub?: string; children?: ReactNode }) {
+export function PageHeader({ title, sub, children }: { title: string; sub?: string | undefined; children?: ReactNode }) {
   return (
     <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
       <div>
@@ -41,7 +41,7 @@ export function PageHeader({ title, sub, children }: { title: string; sub?: stri
   );
 }
 
-export function Stat({ label, value, hint, tone }: { label: string; value: ReactNode; hint?: string; tone?: Tone }) {
+export function Stat({ label, value, hint, tone }: { label: string; value: ReactNode; hint?: string | undefined; tone?: Tone | undefined }) {
   return (
     <div className="rounded-md border bg-card px-4 py-3">
       <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</div>
@@ -52,7 +52,7 @@ export function Stat({ label, value, hint, tone }: { label: string; value: React
   );
 }
 
-export function Panel({ title, action, children, className }: { title: string; action?: ReactNode; children: ReactNode; className?: string }) {
+export function Panel({ title, action, children, className }: { title: string; action?: ReactNode; children: ReactNode; className?: string | undefined }) {
   return (
     <section className={cn("rounded-md border bg-card", className)}>
       <header className="flex items-center justify-between border-b px-4 py-2.5">
@@ -63,7 +63,7 @@ export function Panel({ title, action, children, className }: { title: string; a
   );
 }
 
-export function Table({ head, children, empty }: { head: string[]; children: ReactNode; empty?: boolean }) {
+export function Table({ head, children, empty }: { head: string[]; children: ReactNode; empty?: boolean | undefined }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">

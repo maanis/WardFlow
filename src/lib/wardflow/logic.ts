@@ -20,9 +20,9 @@ export interface Patient {
   bed: number | null;
   admissionDate: string;
   status: PatientStatus;
-  approvedAt?: string;
-  closedAt?: string;
-  closeNote?: string;
+  approvedAt?: string | undefined;
+  closedAt?: string | undefined;
+  closeNote?: string | undefined;
 }
 export interface Reading { id: string; patientId: string; date: string; value: number; recordedAt: string }
 export interface Correction { id: string; patientId: string; date: string; oldValue: number; newValue: number; reason: string; at: string }
@@ -43,7 +43,7 @@ export function dayKey(d: Date): string {
   return `${y}-${m}-${dd}`;
 }
 export function addDays(key: string, n: number): string {
-  const [y, m, d] = key.split("-").map(Number);
+  const [y = 0, m = 1, d = 1] = key.split("-").map(Number);
   return dayKey(new Date(y, m - 1, d + n));
 }
 
