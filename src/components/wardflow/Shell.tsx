@@ -1,31 +1,52 @@
-import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { Link, useRouter, useRouterState } from "@tanstack/react-router";
+import { useEffect, useMemo, type ReactNode } from "react";
 import { Activity, BedDouble, ClipboardList, LayoutDashboard, RotateCcw, Stethoscope, Thermometer, Users } from "lucide-react";
 import { useWard } from "@/lib/wardflow/store";
 import { CAPACITY, ROLE_LABEL, occupiesBed, type Role } from "@/lib/wardflow/logic";
 import { WorkflowGuideDialog } from "./WorkflowGuideDialog";
 
-const NAV = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/patients", label: "Patients", icon: Users },
-  { to: "/temperatures", label: "Temperatures", icon: Thermometer },
-  { to: "/doctor", label: "Doctor", icon: Stethoscope },
-  { to: "/admin", label: "Beds & Discharge", icon: BedDouble },
-  { to: "/reports", label: "Reports", icon: ClipboardList },
-] as const;
+const NAV = {
+  nurse: [
+    { to: "/", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/patients", label: "Patients", icon: Users },
+    { to: "/temperatures", label: "Temperatures", icon: Thermometer },
+  ],
+  doctor: [
+    { to: "/", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/patients", label: "Patients", icon: Users },
+    { to: "/doctor", label: "Doctor Visits & Discharge", icon: Stethoscope },
+  ],
+  admin: [
+    { to: "/", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/patients", label: "Patients", icon: Users },
+    { to: "/admin", label: "Beds & Discharge", icon: BedDouble },
+  ],
+  head: [
+    { to: "/", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/reports", label: "Reports", icon: ClipboardList },
+  ],
+} as const;
 
 export function Shell({ children }: { children: ReactNode }) {
   const { role, setRole, data, today, reset } = useWard();
-  const occupied = data.patients.filter(occupiesBed).length;
+  const router = useRouter();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const nav = useMemo(() => NAV[role], [role]);
+  const occupied = useMemo(() => data.patients.filter(occupiesBed).length, [data.patients]);
+
+  useEffect(() => {
+    if (!nav.some((item) => item.to === pathname)) router.navigate({ to: "/", replace: true });
+  }, [nav, pathname, router]);
+
   return (
     <div className="flex min-h-screen w-full">
-      <aside className="sticky top-0 hidden h-screen w-52 shrink-0 flex-col bg-sidebar text-sidebar-foreground md:flex">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-sidebar text-sidebar-foreground md:flex">
         <div className="flex items-center gap-2 border-b border-sidebar-border px-4 py-3.5">
           <Activity className="h-5 w-5 text-sidebar-primary" />
           <span className="font-semibold text-sidebar-accent-foreground">WardFlow</span>
         </div>
         <nav className="flex-1 space-y-0.5 p-2">
-          {NAV.map(({ to, label, icon: Icon }) => (
+          {nav.map(({ to, label, icon: Icon }) => (
             <Link key={to} to={to} activeOptions={{ exact: to === "/" }}
               className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm hover:bg-sidebar-accent"
               activeProps={{ className: "bg-sidebar-accent text-sidebar-accent-foreground font-medium" }}>
@@ -56,7 +77,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </label>
         </header>
         <nav className="flex gap-1 overflow-x-auto border-b bg-card px-2 py-1.5 md:hidden">
-          {NAV.map(({ to, label }) => (
+          {nav.map(({ to, label }) => (
             <Link key={to} to={to} activeOptions={{ exact: to === "/" }} className="whitespace-nowrap rounded-md px-2.5 py-1 text-sm text-muted-foreground"
               activeProps={{ className: "bg-accent text-accent-foreground font-medium" }}>{label}</Link>
           ))}
