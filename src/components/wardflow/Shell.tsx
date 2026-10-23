@@ -80,8 +80,12 @@ export function Shell({ children }: { children: ReactNode }) {
           ))}
         </nav>
         <div className="border-t border-sidebar-border p-3 text-xs">
-          <div>Occupancy</div>
-          <div className="mt-1 text-sidebar-accent-foreground"><b>{occupied}</b> / {CAPACITY} beds</div>
+          <div className="rounded-lg border border-sidebar-border bg-sidebar-accent/50 p-4">
+            <div className="flex items-center justify-between"><div className="text-[11px] font-medium uppercase tracking-wider opacity-70">Ward snapshot</div><RoleIcon className="h-5 w-5 text-sidebar-primary" /></div>
+            <div className="mt-3 flex items-end gap-2"><span className="text-3xl font-semibold text-sidebar-accent-foreground">{occupied}</span><span className="mb-1 text-xs opacity-70">of {CAPACITY} beds occupied</span></div>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-sidebar-border"><div className="h-full rounded-full bg-sidebar-primary transition-[width] duration-700" style={{ width: `${(occupied / CAPACITY) * 100}%` }} /></div>
+            <div className="mt-3 flex items-center justify-between border-t border-sidebar-border pt-3"><span className="text-[11px] opacity-70">Active workspace</span><span className="rounded-full bg-sidebar-primary/15 px-2 py-1 text-[11px] font-medium text-sidebar-primary">{ROLE_LABEL[role]}</span></div>
+          </div>
           <button onClick={reset} className="mt-3 flex items-center gap-1 opacity-70 hover:opacity-100"><RotateCcw className="h-3 w-3" />Reset demo data</button>
         </div>
       </aside>

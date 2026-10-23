@@ -52,7 +52,12 @@ export function WorkflowGuideDialog() {
           </DialogTitle>
           <DialogDescription>How patient operations move through the 74-bed quarantine centre.</DialogDescription>
         </DialogHeader>
-        <div className="min-h-0 space-y-6 overflow-y-auto px-5 pb-5">
+        <div className="min-h-0 space-y-6 overflow-y-auto px-5 mt-4 pb-5">
+          <div className="grid grid-cols-3 gap-2 rounded-lg border bg-muted/40 p-3 text-center">
+            <div><div className="text-lg font-semibold text-primary">74</div><div className="text-[11px] text-muted-foreground">Beds</div></div>
+            <div className="border-x"><div className="text-lg font-semibold text-primary">4</div><div className="text-[11px] text-muted-foreground">Roles</div></div>
+            <div><div className="text-lg font-semibold text-primary">7</div><div className="text-[11px] text-muted-foreground">Workflow steps</div></div>
+          </div>
           <section className="pt-1">
             <h2 className="text-sm font-semibold">What is WardFlow?</h2>
             <p className="mt-1 text-sm text-muted-foreground">WardFlow coordinates daily temperature recording, doctor visits, discharge approvals, bed availability, and closed-case reporting for a 74-bed quarantine centre.</p>

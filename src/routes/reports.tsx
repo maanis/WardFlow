@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader, Panel } from "@/components/wardflow/ui";
-import { ClosedCasesTable, MortalitySummary } from "@/components/wardflow/reports";
+import { ClosedCasesTable, MortalitySummary, OutcomeChart } from "@/components/wardflow/reports";
 
 export const Route = createFileRoute("/reports")({
   head: () => ({
@@ -20,6 +20,7 @@ function Reports() {
       <PageHeader title="Reports" sub="Read-only outcomes. Mortality = deaths ÷ closed cases × 100." />
       <div className="space-y-4">
         <MortalitySummary />
+        <Panel title="Patient outcomes" action={<span className="text-xs text-muted-foreground">Hover bars for details</span>}><OutcomeChart /></Panel>
         <Panel title="Closed cases"><ClosedCasesTable /></Panel>
       </div>
     </>

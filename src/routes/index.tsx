@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { Bar, BarChart, CartesianGrid, Scatter, ScatterChart, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { useWard } from "@/lib/wardflow/store";
 import {
   CAPACITY, MORTALITY_THRESHOLD, ROLE_LABEL, feverFreeStreak, isEligible, isFever, mortality, occupiesBed, todayReading, visitedOn,
@@ -43,6 +45,12 @@ function NurseDash() {
   const done = active.length - pending.length;
   const fevers = active.filter((p) => { const r = todayReading(data, p.id, today); return r && isFever(r.value); });
   const sorted = [...pending, ...active.filter((p) => !pending.includes(p))];
+  const chartData = [
+    { label: "Recorded", value: done, fill: "var(--color-recorded)", key: "recorded" },
+    { label: "Pending", value: pending.length, fill: "var(--color-pending)", key: "pending" },
+    { label: "Fever", value: fevers.length, fill: "var(--color-fever)", key: "fever" },
+  ];
+  const scatterData = active.map((patient) => ({ bed: patient.bed ?? 0, temperature: todayReading(data, patient.id, today)?.value ?? 0 })).filter((point) => point.temperature > 0);
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -65,14 +73,43 @@ function NurseDash() {
           })}
         </Table>
       </Panel>
+      <Panel title="Today's reading overview" action={<span className="text-xs text-muted-foreground">Hover bars for details</span>}>
+        <ChartContainer config={nurseChartConfig} className="h-56 w-full aspect-auto px-3 py-2">
+          <BarChart data={chartData} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
+            <CartesianGrid vertical={false} />
+            <XAxis dataKey="label" tickLine={false} axisLine={false} />
+            <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent labelKey="key" />} />
+            <Bar dataKey="value" radius={[4, 4, 0, 0]} animationDuration={900} />
+          </BarChart>
+        </ChartContainer>
+      </Panel>
+      <Panel title="Temperature distribution" action={<span className="text-xs text-muted-foreground">Bed vs. reading</span>}>
+        <ChartContainer config={nurseChartConfig} className="h-56 w-full aspect-auto px-3 py-2">
+          <ScatterChart margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
+            <CartesianGrid />
+            <XAxis dataKey="bed" name="Bed" tickLine={false} axisLine={false} />
+            <YAxis dataKey="temperature" name="Temperature" domain={[34, 42]} tickLine={false} axisLine={false} />
+            <ChartTooltip cursor={{ strokeDasharray: "3 3" }} content={<ChartTooltipContent />} />
+            <Scatter data={scatterData} fill="var(--color-recorded)" animationDuration={900} />
+          </ScatterChart>
+        </ChartContainer>
+      </Panel>
       <TempDialog patient={temp} onClose={() => setTemp(null)} />
     </div>
   );
 }
 
+const nurseChartConfig = {
+  recorded: { label: "Recorded", color: "var(--success)" },
+  pending: { label: "Pending", color: "var(--warning)" },
+  fever: { label: "Fever", color: "var(--danger)" },
+} satisfies ChartConfig;
+
 function DoctorDash() {
   const { data, today } = useWard();
   const [open, setOpen] = useState<string | null>(null);
+  const [view, setView] = useState<"fever" | "eligible" | "visits">("fever");
   const active = data.patients.filter((p) => p.status === "active");
   const awaitingVisit = active.filter((p) => !visitedOn(data, p.id, today));
   const fevers = active.filter((p) => { const r = todayReading(data, p.id, today); return r && isFever(r.value); });
@@ -95,11 +132,14 @@ function DoctorDash() {
         <Stat label="Eligible for discharge" value={eligible.length} tone="success" />
         <Stat label="Approved, awaiting admin" value={approved.length} />
       </div>
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Panel title="Fever alerts"><List items={fevers} /></Panel>
-        <Panel title="Eligible for discharge"><List items={eligible} /></Panel>
-        <Panel title="Awaiting today's visit" className="xl:col-span-2"><List items={awaitingVisit} /></Panel>
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" variant={view === "fever" ? "default" : "outline"} onClick={() => setView("fever")}>Fever alerts ({fevers.length})</Button>
+        <Button size="sm" variant={view === "eligible" ? "default" : "outline"} onClick={() => setView("eligible")}>Eligible ({eligible.length})</Button>
+        <Button size="sm" variant={view === "visits" ? "default" : "outline"} onClick={() => setView("visits")}>Awaiting visits ({awaitingVisit.length})</Button>
       </div>
+      <Panel title={view === "fever" ? "Fever alerts" : view === "eligible" ? "Eligible for discharge" : "Awaiting today's visit"}>
+        <List items={view === "fever" ? fevers : view === "eligible" ? eligible : awaitingVisit} />
+      </Panel>
       <PatientDialog patientId={open} onClose={() => setOpen(null)} />
     </div>
   );

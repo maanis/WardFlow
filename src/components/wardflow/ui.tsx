@@ -1,4 +1,4 @@
-import { Children, useEffect, useState, type ReactNode } from "react";
+import { Children, cloneElement, isValidElement, useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -74,6 +74,13 @@ export function Table({ head, children, empty }: { head: string[]; children: Rea
   const currentPage = Math.min(page, pageCount - 1);
   const start = currentPage * ROWS_PER_PAGE;
   const visibleRows = rows.slice(start, start + ROWS_PER_PAGE);
+  const animatedRows = visibleRows.map((row, index) => {
+    if (!isValidElement<{ className?: string; style?: CSSProperties }>(row)) return row;
+    return cloneElement(row, {
+      className: cn(row.props.className, "animate-in fade-in-0 duration-700"),
+      style: { ...row.props.style, animationDelay: `${index * 35}ms`, animationFillMode: "backwards" },
+    });
+  });
 
   useEffect(() => {
     setPage((current) => Math.min(current, pageCount - 1));
@@ -81,13 +88,13 @@ export function Table({ head, children, empty }: { head: string[]; children: Rea
 
   return (
     <div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+      <div className="overflow-x-hidden">
+        <table className="w-full text-xs sm:text-sm">
           <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
-            <tr>{head.map((h) => <th key={h} className="whitespace-nowrap px-3 py-2 font-medium">{h}</th>)}</tr>
+            <tr>{head.map((h) => <th key={h} className="whitespace-nowrap px-2 py-2 font-medium sm:px-3">{h}</th>)}</tr>
           </thead>
           <tbody className="divide-y">
-            {empty ? <tr><td colSpan={head.length} className="px-3 py-6 text-center text-muted-foreground">Nothing to show.</td></tr> : visibleRows}
+            {empty ? <tr><td colSpan={head.length} className="px-3 py-6 text-center text-muted-foreground">Nothing to show.</td></tr> : animatedRows}
           </tbody>
         </table>
       </div>
@@ -104,7 +111,7 @@ export function Table({ head, children, empty }: { head: string[]; children: Rea
     </div>
   );
 }
-export const Td = ({ children, className }: { children?: ReactNode; className?: string }) => <td className={cn("whitespace-nowrap px-3 py-2", className)}>{children}</td>;
+export const Td = ({ children, className }: { children?: ReactNode; className?: string }) => <td className={cn("whitespace-nowrap px-2 py-2 sm:px-3", className)}>{children}</td>;
 
 export const fmtDate = (s: string) => new Date(s.length === 10 ? s + "T00:00:00" : s).toLocaleDateString(undefined, { day: "2-digit", month: "short" });
 export const fmtTime = (s: string) => new Date(s).toLocaleString(undefined, { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });

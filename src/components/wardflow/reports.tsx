@@ -1,7 +1,27 @@
 import { AlertTriangle, Info } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { useWard } from "@/lib/wardflow/store";
 import { MIN_CASES_FOR_RELIABLE_RATE, MORTALITY_THRESHOLD, isClosed, mortality, occupiesBed } from "@/lib/wardflow/logic";
 import { Stat, StatusPill, Table, Td, fmtDate } from "./ui";
+
+const outcomeChartConfig = {
+  active: { label: "Active", color: "var(--primary)" },
+  recovered: { label: "Recovered", color: "var(--success)" },
+  deceased: { label: "Deceased", color: "var(--danger)" },
+} satisfies ChartConfig;
+
+export function OutcomeChart() {
+  const { data } = useWard();
+  const m = mortality(data.patients);
+  const chartData = [
+    { outcome: "Active", key: "active", value: data.patients.filter(occupiesBed).length, fill: "var(--color-active)" },
+    { outcome: "Recovered", key: "recovered", value: m.recoveries, fill: "var(--color-recovered)" },
+    { outcome: "Deceased", key: "deceased", value: m.deaths, fill: "var(--color-deceased)" },
+  ];
+
+  return <div className="grid gap-4 lg:grid-cols-2"><ChartContainer config={outcomeChartConfig} className="h-64 w-full aspect-auto"><BarChart data={chartData} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}><CartesianGrid vertical={false} /><XAxis dataKey="outcome" tickLine={false} axisLine={false} /><YAxis allowDecimals={false} tickLine={false} axisLine={false} /><ChartTooltip cursor={false} content={<ChartTooltipContent labelKey="key" />} /><Bar dataKey="value" radius={[4, 4, 0, 0]} animationDuration={900} /></BarChart></ChartContainer><ChartContainer config={outcomeChartConfig} className="h-64 w-full aspect-auto"><PieChart><ChartTooltip content={<ChartTooltipContent labelKey="key" />} /><Pie data={chartData} dataKey="value" nameKey="outcome" innerRadius={52} outerRadius={82} paddingAngle={3} animationDuration={900}>{chartData.map((entry) => <Cell key={entry.key} fill={entry.fill} />)}</Pie></PieChart></ChartContainer></div>;
+}
 
 export function MortalitySummary() {
   const { data } = useWard();
