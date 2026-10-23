@@ -40,10 +40,10 @@ describe("WardFlow rules", () => {
   });
   it("eligibility needs 3 fever-free recorded days incl. today plus today's visit", () => {
     const visit = (d: WardData) => { const r = markVisit(d, "doctor", "WF-0001", "", T, ""); return r.ok ? r.data : d; };
-    expect(isEligible(visit(withTemps([37, 37, 37])), base().patients[0], T)).toBe(true);
-    expect(isEligible(withTemps([37, 37, 37]), base().patients[0], T)).toBe(false); // no visit
-    expect(isEligible(visit(withTemps([37, 38, 37])), base().patients[0], T)).toBe(false); // 38 is fever
-    expect(isEligible(visit(withTemps([37, null, 37])), base().patients[0], T)).toBe(false); // missing day
+    expect(isEligible(visit(withTemps([37, 37, 37])), base().patients[0]!, T)).toBe(true);
+    expect(isEligible(withTemps([37, 37, 37]), base().patients[0]!, T)).toBe(false); // no visit
+    expect(isEligible(visit(withTemps([37, 38, 37])), base().patients[0]!, T)).toBe(false); // 38 is fever
+    expect(isEligible(visit(withTemps([37, null, 37])), base().patients[0]!, T)).toBe(false); // missing day
   });
   it("approval keeps the bed; admin completion frees it", () => {
     let d = withTemps([37, 37, 37]);
