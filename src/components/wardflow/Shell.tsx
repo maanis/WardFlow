@@ -1,6 +1,7 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { useEffect, useMemo, type ReactNode } from "react";
-import { Activity, BedDouble, ClipboardList, LayoutDashboard, RotateCcw, Stethoscope, Thermometer, UserRoundCog, Users } from "lucide-react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { Activity, BedDouble, ClipboardList, LayoutDashboard, Moon, RotateCcw, Stethoscope, Sun, Thermometer, UserRoundCog, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useWard } from "@/lib/wardflow/store";
 import { CAPACITY, ROLE_LABEL, occupiesBed, type Role } from "@/lib/wardflow/logic";
@@ -42,10 +43,25 @@ export function Shell({ children }: { children: ReactNode }) {
   const nav = useMemo(() => NAV[role], [role]);
   const occupied = useMemo(() => data.patients.filter(occupiesBed).length, [data.patients]);
   const RoleIcon = ROLE_ICONS[role];
+  const [dark, setDark] = useState(false);
 
   useEffect(() => {
     if (!nav.some((item) => item.to === pathname)) router.navigate({ to: "/", replace: true });
   }, [nav, pathname, router]);
+
+  useEffect(() => {
+    setDark(localStorage.getItem("wardflow:theme") === "dark");
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+  }, [dark]);
+
+  const toggleTheme = () => {
+    const next = !dark;
+    setDark(next);
+    localStorage.setItem("wardflow:theme", next ? "dark" : "light");
+  };
 
   return (
     <div className="flex min-h-screen w-full">
@@ -77,6 +93,9 @@ export function Shell({ children }: { children: ReactNode }) {
             Quarantine Centre · {new Date(today + "T00:00:00").toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
           </span>
           <div className="ml-auto"><WorkflowGuideDialog /></div>
+          <Button size="icon" variant="ghost" aria-label={dark ? "Switch to light mode" : "Switch to dark mode"} title={dark ? "Switch to light mode" : "Switch to dark mode"} onClick={toggleTheme}>
+            {dark ? <Sun /> : <Moon />}
+          </Button>
           <Select value={role} onValueChange={(value) => setRole(value as Role)}>
             <SelectTrigger aria-label="Change demo role" className="h-9 w-40 gap-2 rounded-lg bg-card px-2.5 shadow-sm sm:w-48">
               <RoleIcon className="h-4 w-4 shrink-0 text-primary" />

@@ -45,14 +45,14 @@ export function WorkflowGuideDialog() {
           <BookOpen className="h-4 w-4" />Help
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[calc(100vh-2rem)] max-w-3xl overflow-y-auto p-0 sm:rounded-lg">
+      <DialogContent className="grid h-[min(44rem,calc(100dvh-2rem))] w-[calc(100%-2rem)] max-w-3xl grid-rows-[auto_minmax(0,1fr)] gap-0 overflow-hidden p-0 sm:rounded-lg">
         <DialogHeader className="border-b bg-muted/30 px-5 py-4 pr-12 text-left">
           <DialogTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-primary" />WardFlow Workflow Guide
           </DialogTitle>
           <DialogDescription>How patient operations move through the 74-bed quarantine centre.</DialogDescription>
         </DialogHeader>
-        <div className="space-y-6 px-5 pb-5">
+        <div className="min-h-0 space-y-6 overflow-y-auto px-5 pb-5">
           <section className="pt-1">
             <h2 className="text-sm font-semibold">What is WardFlow?</h2>
             <p className="mt-1 text-sm text-muted-foreground">WardFlow coordinates daily temperature recording, doctor visits, discharge approvals, bed availability, and closed-case reporting for a 74-bed quarantine centre.</p>
